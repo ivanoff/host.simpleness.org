@@ -1,0 +1,78 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+acl pnc {
+    78.46.46.150;
+};
+
+zone "exli.net" {
+    type master;
+    file "/etc/bind/zones/exli.net.db";
+    allow-transfer  { pnc; };
+};
+
+zone "openacd.com" {
+    type master;
+    file "/etc/bind/zones/openacd.com.db";
+    allow-transfer  { pnc; };
+};
+
+zone "ship.org.ua" {
+    type master;
+    file "/etc/bind/zones/ship.org.ua.db";
+    allow-transfer  { pnc; };
+};
+
+zone "civ.org.ua" {
+    type master;
+    file "/etc/bind/zones/civ.org.ua.db";
+    allow-transfer  { pnc; };
+};
+
+zone "gori.org.ua" {
+    type master;
+    file "/etc/bind/zones/gori.org.ua.db";
+    allow-transfer  { pnc; };
+};
+
+zone "sirenko.org.ua" {
+    type master;
+    file "/etc/bind/zones/sirenko.org.ua.db";
+    allow-transfer  { pnc; };
+};
+
+zone "sharashidze.com" {
+    type master;
+    file "/etc/bind/zones/sharashidze.com.db";
+    allow-transfer  { pnc; };
+};
+
+zone "spendiarov.com" {
+    type master;
+    file "/etc/bind/zones/spendiarov.com.db";
+    allow-transfer  { pnc; };
+};
+
+zone "dirdovsky.com" {
+    type master;
+    file "/etc/bind/zones/dirdovsky.com.db";
+    allow-transfer  { pnc; };
+};
+
+zone "7hobbies.com" {
+    type master;
+    file "/etc/bind/zones/7hobbies.com.db";
+    allow-transfer  { pnc; };
+};
+
+zone "simpleness.org" {
+    type master;
+    file "/etc/bind/zones/simpleness.org.db";
+    allow-transfer  { pnc; };
+};
+

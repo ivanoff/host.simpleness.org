@@ -1,0 +1,21 @@
+;
+; BIND data file for local loopback interface
+;
+$TTL    1h
+@       IN      SOA     ns1.exli.net. root.exli.net. (
+                    2011060530 ; Serial
+            	    3h         ; Refresh
+                    1h         ; Retry
+            	    1w         ; Expire
+            	    1d )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.exli.net.
+@       IN      NS      ns2.exli.net.
+
+@       MX 	10	mx.civ.org.ua.
+
+@       IN      A       88.198.1.2
+www		CNAME	@
+mx      IN      A       88.198.1.2
+*       IN      A       88.198.1.2
+

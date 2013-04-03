@@ -1,0 +1,9 @@
+proc /proc proc defaults 0 0
+none /dev/pts devpts gid=5,mode=620 0 0
+/dev/md0 none swap sw 0 0
+/dev/md1 /boot ext3 defaults 0 0
+/dev/md2 / ext3 defaults 0 0
+/dev/md3 /var ext3 defaults 0 0
+/dev/md4 /usr ext3 defaults 0 0
+/dev/md5 /tmp ext3 defaults 0 0
+/dev/md6 /home ext3 defaults,usrquota 1 1

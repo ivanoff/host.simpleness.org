@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+
+	AssignUserId simpleness simpleness
+
+        ServerName simpleness.org
+        ServerAlias *.simpleness.org
+        DocumentRoot /home/simpleness/www
+        ScriptAlias /cgi-bin/ /home/simpleness/www/cgi-bin
+
+        <Directory />
+                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+                AllowOverride All
+                AddHandler cgi-script .cgi .pl
+                Order allow,deny
+                allow from all
+        </Directory>
+
+        ErrorLog /var/log/apache2/users/simpleness/error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog /var/log/apache2/users/simpleness/access.log combined
+
+</VirtualHost>
+
