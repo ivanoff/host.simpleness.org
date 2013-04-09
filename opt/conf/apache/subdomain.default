@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+
+	AssignUserId [% user %] [% user %]
+
+        ServerName [% subdomain %].[% domain %]
+        ServerAlias *.[% subdomain %].[% domain %]
+        DocumentRoot /home/[% user %]/[% domain %]/[% subdomain %]
+        ScriptAlias /cgi-bin/ /home/[% user %]/[% domain %]/[% subdomain %]/cgi-bin
+
+        <Directory />
+                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+                AllowOverride All
+                AddHandler cgi-script .cgi .pl
+                Order allow,deny
+                allow from all
+        </Directory>
+
+        ErrorLog /home/[% user %]/[% domain %]/[% subdomain %]/log/apache2/error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog /home/[% user %]/[% domain %]/[% subdomain %]/log/apache2/access.log combined
+
+</VirtualHost>
+
