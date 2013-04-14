@@ -1,0 +1,110 @@
+#!/bin/bash
+
+useradd -m -s /bin/bash -d /home/master -p lomaster master
+passwd master
+
+aptitude -y update
+aptitude -y upgrade
+
+aptitude -y install gcc build-essential automake checkinstall
+aptitude -y install imagemagick
+aptitude -y install perlmagick libcrypt-ssleay-perl libnet-ssleay-perl
+aptitude -y install libgd2-xpm-dev
+aptitude -y install libssl-dev
+
+cp -f /opt/openhost/backup/etc/ssh/sshd_config /etc/ssh/sshd_config
+/etc/init.d/ssh restart
+
+aptitude -y install fail2ban
+cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+cp -f /opt/openhost/backup/etc/fail2ban/jail.local /etc/fail2ban/jail.local
+sudo /etc/init.d/fail2ban restart
+
+aptitude -y install subversion mc
+
+aptitude -y install bind9
+cp -f /opt/openhost/backup/etc/bind/named.conf.local /etc/bind/named.conf.local
+cp -f /opt/openhost/backup/etc/bind/named.conf.options /etc/bind/named.conf.options
+cp -f /opt/openhost/backup/etc/bind/zones/exli.net.db /etc/bind/zones/exli.net.db
+/etc/init.d/bind9 restart
+
+aptitude -y install apache2 libapache2-svn apache2-mpm-itk
+a2enmod rewrite
+a2enmod expires
+a2enmod ssl
+mkdir /etc/apache2/ssl
+/usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem
+cp -f /opt/openhost/backup/etc/apache2/conf.d/vhosts.conf /etc/apache2/conf.d/vhosts.conf
+cp -f /opt/openhost/backup/etc/apache2/sites-available/exli.net /etc/apache2/sites-available/exli.net
+ln -s /etc/apache2/sites-available/exli.net /etc/apache2/sites-enabled/exli.net
+mkdir -p /home/master/www/cgi-bin
+cp -f /var/www/index.html /home/master/www/index.html
+mkdir -p /var/log/apache2/users/master/
+/etc/init.d/apache2 restart
+
+aptitude -y install mysql-server mysql-client php5-mysql libdbd-mysql-perl
+
+aptitude -y install dovecot-common dovecot-imapd dovecot-pop3d
+cp -f /opt/openhost/backup/etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf
+cp -f /opt/openhost/backup/etc/dovecot/passwd /etc/dovecot/passwd
+/etc/init.d/dovecot restart
+
+mkdir -p /etc/ssl/mycerts
+cp -f /opt/openhost/backup/etc/ssl/mycerts/create_crt.sh /etc/ssl/mycerts/create_crt.sh
+cd /etc/ssl/mycerts/ && ./create_crt.sh
+cd /opt/openhost/
+
+aptitude -y install vsftpd libpam-pwdfile
+
+aptitude -y install exim4-daemon-heavy
+dpkg-reconfigure exim4-config
+mkdir -p /opt/openhost/backup/etc/exim4/domains
+mkdir -p /opt/openhost/backup/etc/exim4/virtual
+mkdir -p /opt/openhost/backup/etc/exim4/userforward
+cp -f /opt/openhost/backup/etc/exim4/authrelay /etc/exim4/authrelay
+cp -f /opt/openhost/backup/etc/exim4/exim4.conf /etc/exim4/exim4.conf
+cp -f /opt/openhost/backup/etc/exim4/postini_filtered /etc/exim4/postini_filtered
+cp -f /opt/openhost/backup/etc/exim4/userdomains /etc/exim4/userdomains
+cp -f /opt/openhost/backup/etc/exim4/virtual/exli.net /etc/exim4/virtual/exli.net
+cp -f /opt/openhost/backup/etc/exim4/domains/exli.net /etc/exim4/domains/exli.net
+/etc/init.d/exim4 restart
+
+aptitude -y install quota
+touch /home/quota.user /home/quota.group
+chmod 600 /home/quota.*
+mount -o remount /home
+
+#create database sirenko;
+#create user 'sirenko'@'localhost' IDENTIFIED BY 'sirenK0123';
+#GRANT ALL PRIVILEGES ON sirenko.* TO 'sirenko'@'localhost' WITH GRANT OPTION;
+
+#aptitude -y install clamav clamav-base clamav-daemon
+#freshclam
+#usermod -aG Debian-exim clamav
+
+#sudo perl -MCPAN -e 'install GD'
+#Time::HiRes
+#Digest::MD5
+#File::stat
+#DBI
+#force CGI
+#Template
+#CGI::Session
+#Data::Dump
+#LWP::Debug
+#Image::Magick
+#File::Copy
+#REST::Google::Translate
+#WWW::Mechanize
+#Spreadsheet::Read
+#Mail::Sendmail
+#GD
+#GD::SecurityImage
+#RTF::Writer
+#PDF::API2
+#PDF::API2::Simple
+#Image::Info
+#Email::Send
+#Email::Send::Gmail
+#Email::Simple::Creator
+#Net::SSLeay

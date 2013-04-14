@@ -1,0 +1,29 @@
+Listen 3326
+
+<VirtualHost *:3326>
+
+	AssignUserId ivanoff ivanoff
+
+        ServerName host
+        ServerAlias *.host
+        DocumentRoot /opt/host/www/admin/www
+        ScriptAlias /cgi-bin/ /opt/host/www/admin/www/cgi-bin
+
+        <Directory />
+                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+                AllowOverride All
+                AddHandler cgi-script .cgi .pl
+                Order allow,deny
+                allow from all
+        </Directory>
+
+        ErrorLog /opt/host/www/admin/log/apache2/error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog /opt/host/www/admin/log/apache2/access.log combined
+
+</VirtualHost>
+

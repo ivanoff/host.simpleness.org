@@ -2,12 +2,9 @@
 
 use strict;
 use Getopt::Long;
-use File::Path qw(make_path remove_tree);
-use File::Find qw(finddepth);
-use Shell::Command;
-use Template;
+use Host::Apache;
 
-print "Apache management v.0.1\n";
+print "\nApache management v.0.1\n";
 print "more info at: http://host.simpleness.org\n\n";
 
 my ( $help, $domain, $subdomain, $user );
@@ -17,42 +14,17 @@ GetOptions (
             "subdomain=s" => \$subdomain,
             "user=s"      => \$user,
         );
+
 my @command = grep { /^(add|remove|check|info|list|reload)$/ } @ARGV;
 die( &help_message ) if $help || !@command;
 
-my $dir_available = "/etc/apache2/sites-available/";
-my $dir_enabled   = "/etc/apache2/sites-enabled/";
-
-my $template = Template->new( { INCLUDE_PATH => 'conf/apache/' } );
+my $apache = new Host::Apache;
 
 $_ = $command[0];
 
 #add server
 /^add$/ && do {
-    my $check = &check_option( 'domain', 'user' );
-    die $check if $check;
-    $check = &check_option( 'subdomain' );
-    die $check if $subdomain && $check;
-
-    make_path( $dir_available.$domain );
-    $template->process( 'domain.default', { domain => $domain, user => $user }, $dir_available.$domain );
-    symlink $dir_available.$domain, $dir_enabled.$domain;
-
-    make_path( "/home/$user/$domain/www/cgi-bin", "/home/$user/$domain/log/apache2" );
-    touch( "/home/$user/$domain/log/apache2/access.log", "/home/$user/$domain/log/apache2/error.log" );
-
-    if( $subdomain ) {
-        make_path( $dir_available.$domain.'/'.$subdomain );
-        $template->process( 'subdomain.default', { domain => $domain, subdomain=>$subdomain, user => $user }, 
-                        $dir_available.$domain.'/'.$subdomain );
-
-        make_path( "/home/$user/$domain/$subdomain/www/cgi-bin", "/home/$user/$domain/$subdomain/log/apache2" );
-        touch( "/home/$user/$domain/$subdomain/log/apache2/access.log", "/home/$user/$domain/$subdomain/log/apache2/error.log" );
-        symlink "/home/$user/$domain/$subdomain/log/apache2", "/home/$user/$domain/log/apache2/$subdomain";
-    }
-
-    &own_dir ( "/home/$user/$domain" );
-    &apache ('reload');
+    $apache->add( { 'domain'=>$domain, 'subdomain'=>$subdomain, 'user'=>$user } );
 };
 
 /^remove$/ && do {
@@ -68,58 +40,8 @@ $_ = $command[0];
 };
 
 /^reload$/ && do {
-    &apache ('reload');
+    $apache->reload;
 };
-
-#exec apache commands
-sub apache {
-    @_ = grep { /^(start|stop|reload)$/ } @_;
-    $_ = (@_)? `/etc/init.d/apache2 $_[0] 2>&1` : '';
-    if( /\.{3}done\./ ) {
-        print "Apache server restarted successfully\n";
-        return 1;
-    } else {
-        print "Error while restart Apache server:\n";
-        print $_;
-        return 0;
-    }
-}
-
-sub own_dir {
-    return 0 unless -e $_[0];
-    my ( $login, $pass, $uid, $gid ) = getpwnam( $user );
-    chown $uid, $gid, $_[0];
-    finddepth( sub { chown $uid, $gid, $File::Find::name unless /^\.+$/; }, $_[0] );
-}
-
-#check options
-sub check_option {
-    my $result;
-    if( grep { /^domain$/ } @_ ) {
-        if ($domain) {
-            $result .= "Domain name contains wrong chars\n" if $domain!~/^[a-z0-9][a-z0-9-.]+$/i;
-        } else {
-            $result .= "Domain name missing\n" ;
-        }
-    }
-    if( grep { /^user$/ } @_ ) {
-        if( !$user ) {
-            $result .= "User login missing\n";
-        } elsif( $user !~ /^[\w.-]+$/ ) {
-            $result .= "User name contains wrong chars\n";
-        } elsif( !getpwnam( $user ) ) {
-            $result .= "User $user don't exists\n";
-        }
-    }
-    if( grep { /^subdomain$/ } @_ ) {
-        if ($subdomain) {
-            $result .= "Subdomain name contains wrong chars\n" if $subdomain!~/^[a-z0-9][a-z0-9-]+$/i;
-        } else {
-            $result .= "Subdomain name missing\n" ;
-        }
-    }
-    return ( $result )? $result : 0;
-}
 
 sub help_message {
 <<EOF;
