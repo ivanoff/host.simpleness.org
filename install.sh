@@ -89,6 +89,11 @@ cd /etc/ssl/mycerts/ && ./create_crt.sh
 #freshclam
 #usermod -aG Debian-exim clamav
 
+# cacti stats
+# https://www.digitalocean.com/community/articles/installing-the-cacti-server-monitor-on-ubuntu-12-04-cloud-server
+#sudo apt-get install php5 php5-gd php5-mysql
+#sudo apt-get install snmpd cacti cacti-spine
+
 #CGI::Session
 #Template
 #DBD::Log
